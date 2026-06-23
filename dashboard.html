@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ProfTowel</title>
+<style>
+:root{
+  --bg:#0d1117;--card:#161b22;--border:#30363d;
+  --text:#c9d1d9;--sub:#8b949e;--green:#2ecc71;
+  --red:#e74c3c;--gold:#f0b429;--blue:#58a6ff;--purple:#a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro',sans-serif;max-width:520px;margin:0 auto;padding:12px}
+h1{color:var(--blue);font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.sub{font-size:11px;color:var(--sub);margin-top:2px;margin-bottom:16px}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px}
+.kpi .lbl{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.kpi .val{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.kpi .val.sm{font-size:15px;padding-top:2px}
+.section{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin:14px 0 8px}
+.comp{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px;margin-bottom:7px}
+.comp-row{display:flex;justify-content:space-between;align-items:center}
+.comp-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot.on{background:var(--green);box-shadow:0 0 5px var(--green)}
+.dot.off{background:var(--red)}
+.dot.warn{background:var(--gold)}
+.badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;text-transform:uppercase}
+.badge.ok{background:#2ecc7122;color:var(--green);border:1px solid #2ecc7133}
+.badge.bad{background:#e74c3c22;color:var(--red);border:1px solid #e74c3c33}
+.badge.warn{background:#f0b42922;color:var(--gold);border:1px solid #f0b42933}
+.comp-meta{font-size:11px;color:var(--sub);margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+.restart-btn{color:var(--red);font-weight:700;font-size:11px;text-decoration:none;padding:3px 8px;background:#e74c3c18;border-radius:5px;border:1px solid #e74c3c33;cursor:pointer}
+.btn{display:block;width:100%;padding:13px;border-radius:10px;font-size:15px;font-weight:700;text-align:center;border:none;cursor:pointer;margin-bottom:8px;text-decoration:none}
+.btn-red{background:#e74c3c22;color:var(--red);border:1.5px solid #e74c3c44}
+.btn-blue{background:#58a6ff22;color:var(--blue);border:1.5px solid #58a6ff44}
+.btn-gray{background:var(--card);color:var(--sub);border:1.5px solid var(--border)}
+.btn-green{background:#2ecc7122;color:var(--green);border:1.5px solid #2ecc7144}
+.status-bar{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:11px}
+.live{display:flex;align-items:center;gap:5px;color:var(--green);font-weight:700}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+.offline{color:var(--red);font-weight:700}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.log-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;font-family:monospace;font-size:11px;color:#6e7681;max-height:200px;overflow-y:auto;margin-bottom:8px}
+.log-line{padding:2px 0;border-bottom:1px solid #21262d;line-height:1.4}
+.log-line.success{color:var(--green)}
+.log-line.warn{color:var(--gold)}
+.log-line.error{color:var(--red)}
+.log-line.info{color:var(--blue)}
+.bar-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
+.bar-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #21262d}
+.bar-row:last-child{border-bottom:none}
+.bar-lbl{color:var(--sub)}
+.bar-val{font-weight:700;color:var(--text)}
+.tab-bar{display:flex;gap:4px;margin-bottom:12px;background:var(--card);padding:4px;border-radius:10px;border:1px solid var(--border)}
+.tab{flex:1;padding:7px 4px;text-align:center;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;color:var(--sub);border:none;background:none}
+.tab.active{background:var(--bg);color:var(--blue);border:1px solid var(--border)}
+.hidden{display:none}
+.atr-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}
+.atr-title{font-size:11px;color:var(--purple);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.atr-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+.atr-lbl{color:var(--sub)}
+.atr-val{font-weight:700}
+.footer{text-align:center;font-size:10px;color:var(--sub);margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+.error-box{background:#e74c3c18;border:1px solid #e74c3c44;border-radius:10px;padding:14px;color:var(--red);font-size:13px;text-align:center;margin-bottom:12px}
+.spinner{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:30px auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{text-align:center;color:var(--sub);font-size:13px;margin-bottom:20px}
+.trade-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;font-size:12px}
+.trade-header{display:flex;justify-content:space-between;margin-bottom:4px}
+.trade-action-buy{color:var(--green);font-weight:800}
+.trade-action-sell{color:var(--red);font-weight:800}
+.pill{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:700}
+.pill-green{background:#2ecc7122;color:var(--green)}
+.pill-red{background:#e74c3c22;color:var(--red)}
+</style>
+</head>
+<body>
+
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+  <div>
+    <h1>ProfTowel</h1>
+    <div class="sub" id="uptime-bar">Connecting...</div>
+  </div>
+  <button class="btn-gray" style="padding:7px 12px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub)" onclick="loadData()">&#8635; Refresh</button>
+</div>
+
+<div class="tab-bar">
+  <button class="tab active" onclick="showTab('monitor',this)">Monitor</button>
+  <button class="tab" onclick="showTab('system',this)">System</button>
+  <button class="tab" onclick="showTab('logs',this)">Logs</button>
+  <button class="tab" onclick="showTab('actions',this)">Actions</button>
+</div>
+
+<!-- MONITOR TAB -->
+<div id="tab-monitor">
+  <div class="status-bar">
+    <span id="live-indicator" class="offline">OFFLINE</span>
+    <span id="last-update" style="color:var(--sub)">--</span>
+    <span id="refresh-countdown" style="color:var(--sub)">&#8635; 30s</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="lbl">Balance</div>
+      <div class="val" id="balance" style="color:var(--gold)">--</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Daily P&L</div>
+      <div class="val" id="pnl">--</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Trading</div>
+      <div class="val" id="trading-status" style="font-size:18px">--</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Position</div>
+      <div class="val" id="position" style="font-size:18px">--</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Last Poll</div>
+      <div class="val sm" id="last-poll">--</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Bars Received</div>
+      <div class="val sm" id="bars">--</div>
+    </div>
+  </div>
+
+  <div class="section">Last Bar (NQ=F)</div>
+  <div class="bar-box" id="bar-box">
+    <div class="bar-row"><span class="bar-lbl">Open</span><span class="bar-val" id="b-open">--</span></div>
+    <div class="bar-row"><span class="bar-lbl">High</span><span class="bar-val" id="b-high">--</span></div>
+    <div class="bar-row"><span class="bar-lbl">Low</span><span class="bar-val" id="b-low">--</span></div>
+    <div class="bar-row"><span class="bar-lbl">Close</span><span class="bar-val" id="b-close">--</span></div>
+    <div class="bar-row"><span class="bar-lbl">Volume</span><span class="bar-val" id="b-vol">--</span></div>
+    <div class="bar-row"><span class="bar-lbl">Time</span><span class="bar-val" id="b-time">--</span></div>
+  </div>
+
+  <div class="section">Renaissance ATR</div>
+  <div class="atr-box" id="atr-box">
+    <div class="atr-title">Bayesian ATR Shrinkage (delta=0.3)</div>
+    <div class="atr-row"><span class="atr-lbl">ATR Short (7-bar)</span><span class="atr-val" id="atr-short" style="color:var(--blue)">calculating...</span></div>
+    <div class="atr-row"><span class="atr-lbl">ATR Long (50-bar)</span><span class="atr-val" id="atr-long" style="color:var(--purple)">calculating...</span></div>
+    <div class="atr-row"><span class="atr-lbl">ATR Shrunk</span><span class="atr-val" id="atr-shrunk" style="color:var(--gold)">calculating...</span></div>
+    <div class="atr-row"><span class="atr-lbl">Stop Loss (1.5x)</span><span class="atr-val" id="atr-sl" style="color:var(--red)">--</span></div>
+    <div class="atr-row"><span class="atr-lbl">TP1 (1.5R)</span><span class="atr-val" id="atr-tp1" style="color:var(--green)">--</span></div>
+    <div class="atr-row"><span class="atr-lbl">TP2 (2.5R)</span><span class="atr-val" id="atr-tp2" style="color:var(--green)">--</span></div>
+  </div>
+</div>
+
+<!-- SYSTEM TAB -->
+<div id="tab-system" class="hidden">
+  <div class="section">Components</div>
+  <div id="components-list">Loading...</div>
+</div>
+
+<!-- LOGS TAB -->
+<div id="tab-logs" class="hidden">
+  <div class="section">Live Bot Log</div>
+  <div class="log-box" id="log-box">
+    <div class="log-line">Waiting for data...</div>
+  </div>
+  <button class="btn btn-gray" onclick="loadData()">&#8635; Refresh Logs</button>
+</div>
+
+<!-- ACTIONS TAB -->
+<div id="tab-actions" class="hidden">
+  <div class="section">Quick Actions</div>
+  <button class="btn btn-red" onclick="confirmAction('flatten')">&#9888; Flatten All Positions</button>
+  <button class="btn btn-blue" onclick="confirmAction('restart-bot')">&#8635; Restart LLM Bot</button>
+  <button class="btn btn-blue" onclick="confirmAction('restart-webhook')">&#8635; Restart Webhook</button>
+  <button class="btn btn-green" onclick="confirmAction('restart-all')">&#8635; Restart All Components</button>
+  <button class="btn btn-gray" onclick="loadData()">&#8635; Refresh Dashboard</button>
+
+  <div class="section">Connection</div>
+  <div class="bar-box">
+    <div class="bar-row"><span class="bar-lbl">API URL</span><span class="bar-val" style="font-size:10px;color:var(--blue)" id="api-url-display">--</span></div>
+    <div class="bar-row"><span class="bar-lbl">Webhook</span><span class="bar-val" id="webhook-status">--</span></div>
+    <div class="bar-row"><span class="bar-lbl">Model</span><span class="bar-val" style="color:var(--purple)">proftowel-trader</span></div>
+    <div class="bar-row"><span class="bar-lbl">Symbol</span><span class="bar-val" style="color:var(--gold)">MNQU6</span></div>
+  </div>
+</div>
+
+<div class="footer">
+  ProfessorTowel · MNQ Futures · Topstep · Renaissance Math<br>
+  <span id="tunnel-url" style="color:var(--border)"></span>
+</div>
+
+<script>
+// =============================================================
+//  CONFIG -- Change API URL here if needed
+// =============================================================
+const API = 'https://profTowelBot.serveousercontent.com';
+const REFRESH_INTERVAL = 30; // seconds
+
+// =============================================================
+let refreshTimer = null;
+let countdown    = REFRESH_INTERVAL;
+let lastData     = null;
+
+function showTab(name, el) {
+  document.querySelectorAll('[id^="tab-"]').forEach(t => t.classList.add('hidden'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  if (el) el.classList.add('active');
+}
+
+function fmt(n, dec=2) {
+  if (n === undefined || n === null) return '--';
+  return parseFloat(n).toLocaleString('en-US', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+
+function dot(alive) {
+  return '<span class="dot ' + (alive ? 'on' : 'off') + '"></span>';
+}
+
+function badge(status) {
+  const ok  = status === 'ok';
+  const bad = ['dead','restart_limit','external_down'].includes(status);
+  const cls = ok ? 'ok' : bad ? 'bad' : 'warn';
+  return '<span class="badge ' + cls + '">' + status.toUpperCase() + '</span>';
+}
+
+function renderComponents(comp) {
+  if (!comp) return '<div style="color:var(--sub);font-size:13px;padding:10px">No component data</div>';
+  let html = '';
+  for (const [name, c] of Object.entries(comp)) {
+    html += `
+    <div class="comp">
+      <div class="comp-row">
+        <div class="comp-name">${dot(c.alive)}${c.label || name}</div>
+        ${badge(c.status)}
+      </div>
+      <div class="comp-meta">
+        <span>Restarts: <b style="color:var(--text)">${c.restarts}</b></span>
+        <span>${c.last_check ? c.last_check.substring(11,19) : '--'}</span>
+        <span class="restart-btn" onclick="confirmAction('restart-${name}')">&#8635; restart</span>
+      </div>
+    </div>`;
+  }
+  return html;
+}
+
+function renderLogs(logs) {
+  if (!logs || logs.length === 0) return '<div class="log-line">No logs yet</div>';
+  return logs.slice(-50).reverse().map(l => {
+    const msg = l.msg || l.message || String(l);
+    const t   = l.time || l.timestamp || '';
+    const cls = msg.includes('ERROR') ? 'error' :
+                msg.includes('APPROVED') || msg.includes('ORDER') ? 'success' :
+                msg.includes('BLOCKED') || msg.includes('WARNING') ? 'warn' :
+                msg.includes('LLM') || msg.includes('SMC') ? 'info' : '';
+    return `<div class="log-line ${cls}">[${t}] ${msg}</div>`;
+  }).join('');
+}
+
+function updateATR(botData) {
+  const atr = botData && botData.atr;
+  if (atr) {
+    document.getElementById('atr-short').textContent  = atr.atr_short  ? atr.atr_short.toFixed(2)  + ' pts' : 'calculating...';
+    document.getElementById('atr-long').textContent   = atr.atr_long   ? atr.atr_long.toFixed(2)   + ' pts' : 'calculating...';
+    document.getElementById('atr-shrunk').textContent = atr.atr_shrunk ? atr.atr_shrunk.toFixed(2) + ' pts' : 'calculating...';
+    if (atr.atr_shrunk) {
+      const sl  = (atr.atr_shrunk * 1.5).toFixed(2);
+      const tp1 = (atr.atr_shrunk * 1.5 * 1.5).toFixed(2);
+      const tp2 = (atr.atr_shrunk * 1.5 * 2.5).toFixed(2);
+      document.getElementById('atr-sl').textContent  = sl  + ' pts (' + Math.round(sl/0.25)  + ' ticks)';
+      document.getElementById('atr-tp1').textContent = tp1 + ' pts (' + Math.round(tp1/0.25) + ' ticks)';
+      document.getElementById('atr-tp2').textContent = tp2 + ' pts (' + Math.round(tp2/0.25) + ' ticks)';
+    }
+  }
+}
+
+async function loadData() {
+  clearTimeout(refreshTimer);
+  countdown = REFRESH_INTERVAL;
+
+  try {
+    const r = await fetch(API + '/status', {cache: 'no-store'});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    lastData = d;
+
+    const bd  = d.bot_data || {};
+    const pnl = parseFloat(bd.daily_pnl || 0);
+    const bal = parseFloat(bd.balance || 50000);
+    const halted = bd.trading_halted || false;
+    const lpt    = bd.last_poll_ts || 0;
+    const bars   = bd.bars_received || 0;
+    const bar    = bd.last_bar || {};
+    const logs   = bd.logs || [];
+    const comp   = d.components || {};
+
+    const lastPoll = lpt ? new Date(lpt * 1000).toLocaleTimeString() : 'no data';
+    const pnlCol   = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+    const pos      = bd.open_position || (comp.bot && comp.bot.status === 'ok' ? 'FLAT' : '--');
+
+    // Status bar
+    document.getElementById('live-indicator').innerHTML = '<span class="live"><span class="live-dot"></span>LIVE</span>';
+    document.getElementById('last-update').textContent  = 'Updated ' + new Date().toLocaleTimeString();
+    document.getElementById('uptime-bar').textContent   = 'Uptime: ' + (d.uptime || '--') + ' · Auto-refresh ' + REFRESH_INTERVAL + 's';
+
+    // KPIs
+    document.getElementById('balance').textContent        = '$' + Math.round(bal).toLocaleString();
+    document.getElementById('pnl').textContent            = (pnl >= 0 ? '+' : '') + '$' + fmt(pnl);
+    document.getElementById('pnl').style.color            = pnlCol;
+    document.getElementById('trading-status').textContent = halted ? 'HALTED' : 'ACTIVE';
+    document.getElementById('trading-status').style.color = halted ? 'var(--red)' : 'var(--green)';
+    document.getElementById('position').textContent       = pos;
+    document.getElementById('last-poll').textContent      = lastPoll;
+    document.getElementById('bars').textContent           = bars;
+
+    // Last bar
+    if (bar && bar.close) {
+      document.getElementById('b-open').textContent  = bar.open;
+      document.getElementById('b-high').textContent  = bar.high;
+      document.getElementById('b-low').textContent   = bar.low;
+      document.getElementById('b-close').textContent = bar.close;
+      document.getElementById('b-vol').textContent   = bar.volume ? parseInt(bar.volume).toLocaleString() : '--';
+      document.getElementById('b-time').textContent  = bar.time ? String(bar.time).substring(0,19) : '--';
+    }
+
+    // ATR
+    updateATR(bd);
+
+    // Components
+    document.getElementById('components-list').innerHTML = renderComponents(comp);
+
+    // Logs
+    document.getElementById('log-box').innerHTML = renderLogs(logs);
+
+    // Actions tab
+    document.getElementById('api-url-display').textContent  = API;
+    document.getElementById('webhook-status').textContent   = comp.webhook ? comp.webhook.status : '--';
+    document.getElementById('tunnel-url').textContent       = d.tunnel_url || '';
+
+  } catch(e) {
+    document.getElementById('live-indicator').innerHTML = '<span class="offline">OFFLINE</span>';
+    document.getElementById('uptime-bar').textContent   = 'Cannot reach ' + API;
+
+    document.getElementById('balance').textContent        = '--';
+    document.getElementById('pnl').textContent            = '--';
+    document.getElementById('trading-status').textContent = '--';
+    document.getElementById('position').textContent       = '--';
+    document.getElementById('last-poll').textContent      = 'offline';
+    document.getElementById('bars').textContent           = '--';
+    document.getElementById('components-list').innerHTML  =
+      '<div class="error-box">Cannot connect to bot API<br><small>' + e.message + '</small></div>';
+  }
+
+  startCountdown();
+}
+
+function startCountdown() {
+  clearTimeout(refreshTimer);
+  countdown = REFRESH_INTERVAL;
+  const tick = () => {
+    countdown--;
+    document.getElementById('refresh-countdown').textContent = '&#8635; ' + countdown + 's';
+    if (countdown <= 0) loadData();
+    else refreshTimer = setTimeout(tick, 1000);
+  };
+  refreshTimer = setTimeout(tick, 1000);
+}
+
+async function confirmAction(action) {
+  const labels = {
+    'flatten':         'Flatten ALL positions?',
+    'restart-bot':     'Restart LLM bot?',
+    'restart-webhook': 'Restart webhook server?',
+    'restart-all':     'Restart ALL components?',
+  };
+  const label = labels[action] || ('Run: ' + action + '?');
+  if (!confirm(label)) return;
+
+  try {
+    if (action === 'flatten') {
+      await fetch(API + '/flatten', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({secret:'changeme123', symbol:'MNQU6'})
+      });
+    } else {
+      const name = action.replace('restart-','');
+      await fetch(API + '/restart/' + name);
+    }
+    setTimeout(loadData, 2000);
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+// Start
+loadData();
+</script>
+</body>
+</html>
